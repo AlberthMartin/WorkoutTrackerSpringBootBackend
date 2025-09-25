@@ -1,5 +1,6 @@
 package com.GymApp.GymApp.enums;
 
+
 public enum MuscleGroup {
     CHEST("Chest"),
     BACK("Back"),

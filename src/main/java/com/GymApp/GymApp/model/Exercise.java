@@ -3,10 +3,18 @@ package com.GymApp.GymApp.model;
 import com.GymApp.GymApp.enums.ExerciseType;
 import com.GymApp.GymApp.enums.MuscleGroup;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Exercise {
     @Id
@@ -16,6 +24,10 @@ public class Exercise {
     private String name;
 
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = true)
+    private User createdBy;
 
     @Enumerated(EnumType.STRING)
     private MuscleGroup primaryMuscleGroup;
@@ -31,68 +43,12 @@ public class Exercise {
     @OneToMany(mappedBy = "exercise")
     private List<WorkoutExercise> workoutExercises = new ArrayList<>();
 
-    public Exercise(String name, String description, MuscleGroup primaryMuscleGroup, MuscleGroup secondaryMuscleGroup, ExerciseType exerciseType) {
-           this.name = name;
-           this.description = description;
-           this.primaryMuscleGroup = primaryMuscleGroup;
-           this.secondaryMuscleGroup = secondaryMuscleGroup;
-           this.exerciseType = exerciseType;
-    }
-
-    public Exercise() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public Exercise(String name, String description, MuscleGroup primaryMuscleGroup, MuscleGroup secondaryMuscleGroup, ExerciseType exerciseType, User user) {
         this.name = name;
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
-    }
-
-    public MuscleGroup getPrimaryMuscleGroup() {
-        return primaryMuscleGroup;
-    }
-
-    public void setPrimaryMuscleGroup(MuscleGroup primaryMuscleGroup) {
         this.primaryMuscleGroup = primaryMuscleGroup;
-    }
-
-    public MuscleGroup getSecondaryMuscleGroup() {
-        return secondaryMuscleGroup;
-    }
-
-    public void setSecondaryMuscleGroup(MuscleGroup secondaryMuscleGroup) {
         this.secondaryMuscleGroup = secondaryMuscleGroup;
-    }
-
-    public ExerciseType getExerciseType() {
-        return exerciseType;
-    }
-
-    public void setExerciseType(ExerciseType exerciseType) {
         this.exerciseType = exerciseType;
-    }
-
-    public List<WorkoutExercise> getWorkoutExercises() {
-        return workoutExercises;
-    }
-
-    public void setWorkoutExercises(List<WorkoutExercise> workoutExercises) {
-        this.workoutExercises = workoutExercises;
+        this.createdBy = user;
     }
 }
