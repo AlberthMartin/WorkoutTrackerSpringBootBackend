@@ -2,6 +2,7 @@ package com.GymApp.GymApp.model;
 
 import com.GymApp.GymApp.enums.ExerciseType;
 import com.GymApp.GymApp.enums.MuscleGroup;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class Exercise {
 
     private String description;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = true)
     private User createdBy;
@@ -40,6 +42,7 @@ public class Exercise {
 
     //List of all the workouts the exercise is in
     //One exercise can belong to many workoutExercises
+    @JsonIgnore
     @OneToMany(mappedBy = "exercise")
     private List<WorkoutExercise> workoutExercises = new ArrayList<>();
 
@@ -50,5 +53,13 @@ public class Exercise {
         this.secondaryMuscleGroup = secondaryMuscleGroup;
         this.exerciseType = exerciseType;
         this.createdBy = user;
+    }
+
+    public Exercise(String name, String description, MuscleGroup primaryMuscleGroup, MuscleGroup secondaryMuscleGroup, ExerciseType exerciseType) {
+        this.name = name;
+        this.description = description;
+        this.primaryMuscleGroup = primaryMuscleGroup;
+        this.secondaryMuscleGroup = secondaryMuscleGroup;
+        this.exerciseType = exerciseType;
     }
 }

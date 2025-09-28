@@ -11,7 +11,5 @@ public class UserDto {
     private Long id;
     private String username;
     private String email;
-    private List<WorkoutTemplate> workoutTemplates;
-    private List<Exercise> exercises;
     //private List<CompletedWorkout> completedWorkouts
 }

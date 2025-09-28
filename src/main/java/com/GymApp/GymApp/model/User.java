@@ -1,5 +1,6 @@
 package com.GymApp.GymApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,12 +27,15 @@ public class User {
     private String email;
     private String password;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "createdBy")
     private List<Exercise> exercises = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "createdBy")
     private List<WorkoutTemplate> workoutTemplates = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )

@@ -28,6 +28,9 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
+    //Spring security authenticates user -> wraps user in AppUserDetails
+    //A JWT is generated and also stored in a cookie
+    //Then the controllers can access the authenticated princiapal
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
         try {

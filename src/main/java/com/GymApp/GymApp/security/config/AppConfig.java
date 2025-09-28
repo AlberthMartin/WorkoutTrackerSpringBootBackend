@@ -32,7 +32,7 @@ public class AppConfig {
     private final JwtAuthEntryPoint authEntryPoint;
     private final AuthTokenFilter authTokenFilter;
 
-    private static final List<String> SECURED_URLS =List.of("/api/v2/**");
+    private static final List<String> SECURED_URLS =List.of("/api/v1/exercises/**");
 
     @Bean
     public ModelMapper modelMapper() {
