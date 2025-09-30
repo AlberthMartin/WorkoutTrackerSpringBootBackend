@@ -28,7 +28,7 @@ public class User {
     private String password;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "createdBy")
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises = new ArrayList<>();
 
     @JsonIgnore

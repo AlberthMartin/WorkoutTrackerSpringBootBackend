@@ -118,65 +118,50 @@ public class ExerciseService implements IExerciseService {
     }
 
     @Override
-    public void deleteExerciseByIdAsAdmin(Long exerciseId, AppUserDetails userDetails) {
-        //Is current user an admin?
-        User currentUser = userRepository.findByEmail(userDetails.getUsername());
-        boolean isAdmin = currentUser.getRoles().contains("ROLE_ADMIN");
-
-        //If yes then the admin can delete any exercise.
-        if(isAdmin) {
-            exerciseRepository.findById(exerciseId)
+    public void deleteExerciseByIdAsAdmin(Long exerciseId) {
+        //Only admins can reach this method from the controller
+        exerciseRepository.findById(exerciseId)
                 .ifPresentOrElse(exerciseRepository::delete,
                         () -> {
                             throw new ResourceNotFoundException("Exercise not found");
                         });
-        }
-        //User was not an admin
-        else {
-            throw new ActionNotAllowedException("You are not allowed to delete this exercise.");
-        }
 
     }
 
     @Override
-    public Exercise updateExerciseAsAdmin(UpdateExerciseRequest request, Long exerciseId, AppUserDetails userDetails) {
-        User currentUser = userRepository.findByEmail(userDetails.getUsername());
-        boolean isAdmin = currentUser.getRoles().contains("ROLE_ADMIN");
+    public Exercise updateExerciseAsAdmin(UpdateExerciseRequest request, Long exerciseId) {
+        //Only admins can reach this method
+        Exercise exercise = exerciseRepository.findById(exerciseId)
+            .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
 
-        if(isAdmin) {
-            return exerciseRepository.findById(exerciseId)
-                    .map(existingExercise -> updateExistingExercise(existingExercise, request))
-                    .map(exerciseRepository :: save)
-                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
-        } else {
-            throw new ActionNotAllowedException("You are not allowed to edit this exercise.");
-        }
+        updateExistingExercise(exercise, request);
+        return exerciseRepository.save(exercise);
     }
 
     @Override
     public Exercise updateExerciseAsUser(UpdateExerciseRequest request, Long exerciseId, AppUserDetails userDetails) {
+        //The current user
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        // Find the exercise to be edited
         Exercise exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
 
-        if(exercise.getCreatedBy().getId().equals(currentUser.getId())){
-            return exerciseRepository.findById(exerciseId)
-                    .map(existingExercise -> updateExistingExercise(existingExercise, request))
-                    .map(exerciseRepository :: save)
-                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
-        }
-        else {
+        //If the exercise is NOT created by the user, then the user can NOT update
+        if (!exercise.getCreatedBy().getId().equals(currentUser.getId())) {
             throw new ActionNotAllowedException("You are not allowed to edit this exercise.");
         }
+        //this exercise was created by user current user
+        updateExistingExercise(exercise, request);
+        return exerciseRepository.save(exercise);
     }
 
-    private Exercise updateExistingExercise(Exercise existingExercise, UpdateExerciseRequest request) {
-        existingExercise.setName(request.getName());
-        existingExercise.setDescription(request.getDescription());
-        existingExercise.setPrimaryMuscleGroup(request.getPrimaryMuscleGroup());
-        existingExercise.setSecondaryMuscleGroup(request.getSecondaryMuscleGroup());
-        existingExercise.setExerciseType(request.getExerciseType());
-        return existingExercise;
+    private void updateExistingExercise(Exercise exercise, UpdateExerciseRequest request) {
+        exercise.setName(request.getName());
+        exercise.setDescription(request.getDescription());
+        exercise.setPrimaryMuscleGroup(request.getPrimaryMuscleGroup());
+        exercise.setSecondaryMuscleGroup(request.getSecondaryMuscleGroup());
+        exercise.setExerciseType(request.getExerciseType());
     }
 
     @Override

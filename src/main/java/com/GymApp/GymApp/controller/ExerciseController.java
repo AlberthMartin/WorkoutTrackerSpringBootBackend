@@ -1,10 +1,12 @@
 package com.GymApp.GymApp.controller;
 
 import com.GymApp.GymApp.dto.ExerciseDto;
+import com.GymApp.GymApp.exeptions.ActionNotAllowedException;
 import com.GymApp.GymApp.exeptions.ResourceNotFoundException;
 import com.GymApp.GymApp.model.Exercise;
 import com.GymApp.GymApp.model.User;
 import com.GymApp.GymApp.requests.exercise.AddExerciseRequest;
+import com.GymApp.GymApp.requests.exercise.UpdateExerciseRequest;
 import com.GymApp.GymApp.response.ApiResponse;
 import com.GymApp.GymApp.security.user.AppUserDetails;
 import com.GymApp.GymApp.service.exercise.IExerciseService;
@@ -17,6 +19,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
+
+/*
+Get all exercises	GET	/exercises/all	@AuthenticationPrincipal userDetails
+Get exercise by ID	GET	/exercise/{id}/exercise	@PathVariable id, @AuthenticationPrincipal userDetails
+
+Add user Exercise	POST	/add/user/exercise	@RequestBody AddExerciseRequest, @AuthenticationPrincipal userDetails
+Add Global Exercise	POST	/add/global/exercise	@RequestBody  AddExerciseRequest, @AuthenticationPrincipal userDetails
+
+Delete exercise as USER	DELETE	/exercise/{id}/user/delete	@PathVariable id, @AuthenticationPrincipal userDetails
+Delete exercise as ADMIN	DELETE	/exercise/{id}/admin/delete	@PathVariable id, @AuthenticationPrincipal userDetails
+
+UPDATE exercise as USER	PUT	/exercises/exercise2/user/update	@PathVariable id, @AuthenticationPrincipal userDetails, @RequestBody  UpdateExerciseRequest
+UPDATE exercise as ADMIN	PUT	/exercises/exercise2/admin/update	@PathVariable id,  @RequestBody  UpdateExerciseRequest
+
+*/
 
 @RequiredArgsConstructor
 @RestController
@@ -85,10 +102,10 @@ public class ExerciseController {
     @PreAuthorize("hasRole('ROLE_ADMIN')" )
     public ResponseEntity<ApiResponse> deleteExerciseByIdAsAdmin(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails userDetails){
         try{
-            exerciseService.deleteExerciseByIdAsAdmin(id, userDetails);
+            exerciseService.deleteExerciseByIdAsAdmin(id);
             return ResponseEntity.ok(new ApiResponse("success, exercise deleted as Admin", true));
-        }catch (ResourceNotFoundException e){
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }catch (ResourceNotFoundException | ActionNotAllowedException e){
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
@@ -98,9 +115,34 @@ public class ExerciseController {
         try{
             exerciseService.deleteExerciseByIdAsUser(id, userDetails);
             return ResponseEntity.ok(new ApiResponse("success, exercise deleted as User", null));
+        }catch (ResourceNotFoundException | ActionNotAllowedException e){
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @PutMapping("/exercise/{id}/user/update")
+    @PreAuthorize("hasRole('ROLE_USER')" )
+    public ResponseEntity<ApiResponse> updateExerciseAsUser(@PathVariable Long id, @RequestBody UpdateExerciseRequest request, @AuthenticationPrincipal AppUserDetails userDetails){
+        try{
+            Exercise exercise = exerciseService.updateExerciseAsUser(request, id, userDetails);
+            ExerciseDto exerciseDto = exerciseService.convertToDto(exercise);
+            return ResponseEntity.ok(new ApiResponse("success, exercise updated as USER", exerciseDto));
+        }catch (ResourceNotFoundException | ActionNotAllowedException e){
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @PutMapping("/exercise/{id}/admin/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')" )
+    public ResponseEntity<ApiResponse> updateExerciseAsAdmin(@PathVariable Long id, @RequestBody UpdateExerciseRequest request){
+        try{
+            Exercise exercise = exerciseService.updateExerciseAsAdmin(request, id);
+            ExerciseDto exerciseDto = exerciseService.convertToDto(exercise);
+            return ResponseEntity.ok(new ApiResponse("success, exercise updated as ADMIN", exerciseDto));
         }catch (ResourceNotFoundException e){
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
+
 
 }

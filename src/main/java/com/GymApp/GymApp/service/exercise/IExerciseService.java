@@ -23,9 +23,9 @@ public interface IExerciseService {
 
     void deleteExerciseByIdAsUser(Long exerciseId, AppUserDetails userDetails);
 
-    void deleteExerciseByIdAsAdmin(Long exerciseId, AppUserDetails userDetails);
+    void deleteExerciseByIdAsAdmin(Long exerciseId);
 
-    Exercise updateExerciseAsAdmin(UpdateExerciseRequest request, Long exerciseId, AppUserDetails userDetails);
+    Exercise updateExerciseAsAdmin(UpdateExerciseRequest request, Long exerciseId);
 
     Exercise updateExerciseAsUser(UpdateExerciseRequest request, Long exerciseId, AppUserDetails userDetails);
 
