@@ -29,7 +29,6 @@ public class ExerciseService implements IExerciseService {
     public List<Exercise> getAllExercises(AppUserDetails userDetails) {
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
         return exerciseRepository.findByUserIdOrGlobal(currentUser.getId());
-
     }
 
     //Add exercise, user-specific and global exercises that the admin can create

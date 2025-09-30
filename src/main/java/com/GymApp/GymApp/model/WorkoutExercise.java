@@ -29,6 +29,7 @@ public class WorkoutExercise {
     @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false)
     private Exercise exercise;
+    //KSK kan ha denhä som Long exerciseId
 
 
     @OneToMany(mappedBy = "workoutExercise", cascade = CascadeType.ALL, orphanRemoval = true)

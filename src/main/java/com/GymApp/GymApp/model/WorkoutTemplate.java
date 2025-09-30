@@ -23,7 +23,7 @@ public class WorkoutTemplate {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "created_by", nullable = true)
+    @JoinColumn(name = "created_by", nullable = true, updatable = false)
     private User createdBy;
 
     //cascade = CascadeType.ALL --> when you save/delete a workout, its
