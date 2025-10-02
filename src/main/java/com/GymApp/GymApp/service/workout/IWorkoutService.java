@@ -13,6 +13,10 @@ public interface IWorkoutService {
 
     WorkoutTemplate addUserWorkoutTemplate(CreateWorkoutTemplateRequest request, AppUserDetails userDetails);
 
+    WorkoutTemplate updateUserWorkoutTemplate(CreateWorkoutTemplateRequest request, AppUserDetails userDetails, Long workoutId);
+
+    void deleteUserWorkoutTemplate(Long workoutId, AppUserDetails userDetails);
+
     List<WorkoutTemplateDto> getConvertedWorkoutTemplates(List<WorkoutTemplate> workoutTemplates);
 
     WorkoutTemplateDto convertToDto(WorkoutTemplate template);

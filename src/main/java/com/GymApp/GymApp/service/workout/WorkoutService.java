@@ -1,10 +1,10 @@
 package com.GymApp.GymApp.service.workout;
 
 
-import com.GymApp.GymApp.dto.ExerciseDto;
 import com.GymApp.GymApp.dto.WorkoutExerciseDto;
 import com.GymApp.GymApp.dto.WorkoutSetDto;
 import com.GymApp.GymApp.dto.WorkoutTemplateDto;
+import com.GymApp.GymApp.exeptions.ActionNotAllowedException;
 import com.GymApp.GymApp.exeptions.ResourceNotFoundException;
 import com.GymApp.GymApp.model.*;
 import com.GymApp.GymApp.repository.ExerciseRepository;
@@ -17,32 +17,42 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
 /*
 This is something we want from the frontend
 {
-  "name": "Upper Body 1",
-  "description": "Push/pull workout",
-  "exercises": [
+  "name": "Push Day Strength",
+  "description": "Chest, shoulders, and triceps focused workout.",
+  "workoutExercises": [
     {
-      "exerciseId": 685fa4ac97a4309a9a8cb39e,
+      "exerciseId": 1,
       "orderNumber": 1,
-      "restSeconds": 90,
-      "sets": [
-        { "reps": 10, "weight": 50 },
-        { "reps": 10, "weight": 50 },
-        { "reps": 10, "weight": 55 }
+      "restSeconds": 120,
+      "workoutSets": [
+        { "reps": 8, "weight": 80.0 },
+        { "reps": 6, "weight": 85.0 },
+        { "reps": 6, "weight": 90.0 }
       ]
     },
     {
-      "exerciseId": 686aab6f31ba6904bcf0d742,
+      "exerciseId": 2,
       "orderNumber": 2,
+      "restSeconds": 90,
+      "workoutSets": [
+        { "reps": 10, "weight": 40.0 },
+        { "reps": 10, "weight": 45.0 },
+        { "reps": 8, "weight": 50.0 }
+      ]
+    },
+    {
+      "exerciseId": 3,
+      "orderNumber": 3,
       "restSeconds": 60,
-      "sets": [
-        { "reps": 12, "weight": 30 },
-        { "reps": 12, "weight": 30 }
+      "workoutSets": [
+        { "reps": 12, "weight": 12.5 },
+        { "reps": 12, "weight": 12.5 },
+        { "reps": 12, "weight": 12.5 }
       ]
     }
   ]
@@ -73,46 +83,98 @@ public class WorkoutService implements IWorkoutService {
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
 
         // Create a new workout template
-        WorkoutTemplate template = new  WorkoutTemplate();
+        WorkoutTemplate template = new WorkoutTemplate();
         template.setName(request.getName());
         template.setDescription(request.getDescription());
         template.setCreatedBy(currentUser);
 
-        //Create the WorkoutExercises
-        List<WorkoutExercise> exercises = request.getWorkoutExercises().stream()
-                .map(exerciseRequest -> {
-                    //Fetch the exercise
+        //Creates the workouts exercises and sets
+        List<WorkoutExercise> exercises = createWorkoutExercises(request, template);
+        template.setWorkoutExercises(exercises);
+
+        return workoutTemplateRepository.save(template);
+    }
+
+    /// HELPER METHOD
+    private List<WorkoutExercise> createWorkoutExercises(CreateWorkoutTemplateRequest request, WorkoutTemplate workoutTemplate) {
+        return request.getWorkoutExercises().stream()
+                .map(exerciseRequest ->{
+
+                    //Find the exercise from the request
                     Exercise exercise = exerciseRepository.findById(exerciseRequest.getExerciseId())
                             .orElseThrow(() -> new ResourceNotFoundException("exercise not found"));
-
-                    //Create workoutExercise Object and set values
+                    //Create a workoutExercise object
                     WorkoutExercise we = new WorkoutExercise();
+                    //Set values
                     we.setExercise(exercise);
                     we.setOrderNumber(exerciseRequest.getOrderNumber());
                     we.setRestSeconds(exerciseRequest.getRestSeconds());
+                    we.setWorkoutTemplate(workoutTemplate); //To which templeate does this workoutExercise refer
 
-                    //Create the sets
+                    //Create the sets for the exercise
                     List<WorkoutSet> sets = exerciseRequest.getWorkoutSets().stream()
-                            .map(setReq ->{
+                            .map(setRequest ->{
                                 WorkoutSet workoutSet = new WorkoutSet();
                                 workoutSet.setWorkoutExercise(we);
-                                workoutSet.setReps(setReq.getReps());
-                                workoutSet.setWeight(setReq.getWeight());
+                                workoutSet.setReps(setRequest.getReps());
+                                workoutSet.setWeight(setRequest.getWeight());
                                 workoutSet.setCompleted(false);
                                 return workoutSet;
                             })
                             .toList();
-                    we.setSets(sets);
+                    we.setSets(sets); //Sets the rets
                     return we;
                 })
                 .toList();
-        template.setWorkoutExercises(exercises);
-
-        WorkoutTemplate saved;
-        saved = workoutTemplateRepository.save(template);
-
-        return saved;
     }
+
+    @Override
+    public WorkoutTemplate updateUserWorkoutTemplate(CreateWorkoutTemplateRequest request, AppUserDetails userDetails, Long workoutId) {
+        //Find the user
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        //Find the template:
+        WorkoutTemplate workoutTemplate = workoutTemplateRepository.findById(workoutId)
+                .orElseThrow(() -> new ResourceNotFoundException("workout not found"));
+
+        //Check that the user created the workout
+        if(!workoutTemplate.getCreatedBy().equals(currentUser)) {
+            throw new ActionNotAllowedException("this workout template trying to be updated, does not belong to the current user");
+        }
+
+
+        workoutTemplate.setName(request.getName());
+        workoutTemplate.setDescription(request.getDescription());
+        //User Who created the exercise can't be changed
+
+        //Clear the earlier
+        workoutTemplate.getWorkoutExercises().clear();
+
+        //'Update' the WorkoutExercises meaning just clear the old one and create a new one
+        List<WorkoutExercise> exercises = createWorkoutExercises(request, workoutTemplate);
+        workoutTemplate.setWorkoutExercises(exercises);  //Set new exercises
+
+        //save
+        return workoutTemplateRepository.save(workoutTemplate);
+    }
+
+    @Override
+    public void deleteUserWorkoutTemplate(Long workoutId, AppUserDetails userDetails) {
+        //Find current user
+        User currentUser = userRepository.findByEmail(userDetails.getUsername());
+
+        //Find the workoutTemplate to be deleted:
+        WorkoutTemplate template = workoutTemplateRepository.findById(workoutId)
+                .orElseThrow(() -> new ResourceNotFoundException("workout not found"));
+
+        //Validate
+        if(!template.getCreatedBy().equals(currentUser)) {
+            throw new ActionNotAllowedException("You are not allowed to delete this workout template");
+        }
+        //delete workoutTemplate
+        workoutTemplateRepository.deleteById(workoutId);
+    }
+
 
     @Override
     public List<WorkoutTemplateDto> getConvertedWorkoutTemplates(List<WorkoutTemplate> workoutTemplates) {

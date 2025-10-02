@@ -12,7 +12,7 @@ public interface WorkoutTemplateRepository extends JpaRepository<WorkoutTemplate
 
      List<WorkoutTemplate> findByCreatedById(Long userId);
 
-     @Query("SELECT e FROM Exercise e WHERE e.createdBy.id = :userId OR e.createdBy IS NULL")
+     @Query("SELECT e FROM WorkoutTemplate e WHERE e.createdBy.id = :userId OR e.createdBy IS NULL")
     List<WorkoutTemplate> findByUserIdOrGlobal(@Param("userId") Long userId);
 
 }

@@ -4,6 +4,7 @@ import com.GymApp.GymApp.enums.ExerciseType;
 import com.GymApp.GymApp.enums.MuscleGroup;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,11 +56,12 @@ public class Exercise {
         this.createdBy = user;
     }
 
-    public Exercise(String name, String description, MuscleGroup primaryMuscleGroup, MuscleGroup secondaryMuscleGroup, ExerciseType exerciseType) {
+    public Exercise(@NotBlank String name, String description, @NotBlank MuscleGroup primaryMuscleGroup, MuscleGroup secondaryMuscleGroup, ExerciseType exerciseType) {
         this.name = name;
         this.description = description;
         this.primaryMuscleGroup = primaryMuscleGroup;
         this.secondaryMuscleGroup = secondaryMuscleGroup;
         this.exerciseType = exerciseType;
+        this.createdBy = null;
     }
 }
