@@ -1,23 +1,23 @@
 package com.GymApp.GymApp.service.workout;
 
 
+import com.GymApp.GymApp.dto.ExerciseDto;
+import com.GymApp.GymApp.dto.WorkoutExerciseDto;
+import com.GymApp.GymApp.dto.WorkoutSetDto;
+import com.GymApp.GymApp.dto.WorkoutTemplateDto;
 import com.GymApp.GymApp.exeptions.ResourceNotFoundException;
 import com.GymApp.GymApp.model.*;
 import com.GymApp.GymApp.repository.ExerciseRepository;
 import com.GymApp.GymApp.repository.UserRepository;
 import com.GymApp.GymApp.repository.WorkoutTemplateRepository;
-import com.GymApp.GymApp.requests.workout.CreateWorkoutExerciseRequest;
-import com.GymApp.GymApp.requests.workout.CreateWorkoutSetRequest;
 import com.GymApp.GymApp.requests.workout.CreateWorkoutTemplateRequest;
 import com.GymApp.GymApp.security.user.AppUserDetails;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /*
@@ -112,6 +112,41 @@ public class WorkoutService implements IWorkoutService {
         saved = workoutTemplateRepository.save(template);
 
         return saved;
+    }
+
+    @Override
+    public List<WorkoutTemplateDto> getConvertedWorkoutTemplates(List<WorkoutTemplate> workoutTemplates) {
+        return workoutTemplates.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    @Override
+    public WorkoutTemplateDto convertToDto(WorkoutTemplate template) {
+        //Create the template DTO
+        WorkoutTemplateDto templateDto = modelMapper.map(template, WorkoutTemplateDto.class);
+
+        //convert the exercises to exerciseDTO
+        List<WorkoutExercise> exercises = template.getWorkoutExercises();
+
+        //Map the exercises
+        List<WorkoutExerciseDto> exerciseDtos = exercises.stream()
+                .map(exercise -> {
+                    WorkoutExerciseDto exerciseDto = modelMapper.map(exercise, WorkoutExerciseDto.class);
+
+                    //Map the sets for each exercise
+                    List<WorkoutSetDto> workoutSetDtos = exercise.getSets().stream()
+                            .map(set-> modelMapper.map(set, WorkoutSetDto.class))
+                            .toList();
+                    //For each exercise set the converted workoutsetDTOs
+                    exerciseDto.setWorkoutSets(workoutSetDtos);
+                    return exerciseDto;
+                })
+                .toList();
+
+        //Set the converted exercises to the template
+        templateDto.setWorkoutExercises(exerciseDtos);
+        return templateDto;
     }
 
 }
