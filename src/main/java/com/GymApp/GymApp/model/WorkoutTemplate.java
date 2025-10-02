@@ -31,6 +31,17 @@ public class WorkoutTemplate {
     //orphanRemoval = true → removes WorkoutExercise entries if they are removed from the list
     //One workout contains many workoutExercises
     @OneToMany(mappedBy = "workoutTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorkoutExercise> workoutExercises = new ArrayList<>();
+    private List<WorkoutExercise> WorkoutExercises = new ArrayList<>();
+
+    public void addExercise(WorkoutExercise exercise) {
+        this.WorkoutExercises.add(exercise); //Add the exercis
+        exercise.setWorkoutTemplate(this); //Connect the exercise to this template
+    }
+
+    public void removeExercise(WorkoutExercise exercise) {
+        WorkoutExercises.remove(exercise);
+        exercise.setWorkoutTemplate(null);
+    }
+
 
 }

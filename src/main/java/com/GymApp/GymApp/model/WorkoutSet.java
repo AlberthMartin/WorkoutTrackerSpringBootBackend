@@ -25,4 +25,10 @@ public class WorkoutSet {
     private int reps;
     private double weight;
     private boolean completed;
+
+    public WorkoutSet(int reps, double weight) {
+        this.reps = reps;
+        this.weight = weight;
+        this.completed = false;
+    }
 }

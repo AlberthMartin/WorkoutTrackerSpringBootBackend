@@ -1,5 +1,6 @@
 package com.GymApp.GymApp.model;
 
+import com.GymApp.GymApp.dto.WorkoutSetDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,5 +35,22 @@ public class WorkoutExercise {
 
     @OneToMany(mappedBy = "workoutExercise", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkoutSet> sets = new ArrayList<>();
+
+    public void addSet(WorkoutSet set){
+        set.setWorkoutExercise(this); //connect set to this workoutExercise
+        this.sets.add(set); //ass the set to this exercise
+    }
+
+    public void removeSet(WorkoutSet set){
+        this.sets.remove(set); //remove set
+        set.setWorkoutExercise(null); //disconnect
+    }
+
+    public void updateSet(WorkoutSet set, int reps, double weight){
+        set.setWeight(weight);
+        set.setReps(reps);
+    }
+
+    //TODO: In completed Workouts: Calculate volume per muscle group, sets per muscle group, total volume
 }
 

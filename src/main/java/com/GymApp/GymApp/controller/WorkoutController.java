@@ -47,7 +47,7 @@ public class WorkoutController {
     @PostMapping("/add/user/workout")
     public ResponseEntity<ApiResponse> addUserWorkoutTemplate(@RequestBody CreateWorkoutTemplateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
         try {
-            WorkoutTemplate workoutTemplate = workoutService.addUserWorkoutTemplate(request, userDetails);
+            WorkoutTemplate workoutTemplate = workoutService.addUserWorkoutTemplateV2(request, userDetails);
             WorkoutTemplateDto workoutTemplateDto = workoutService.convertToDto(workoutTemplate);
             //Convert the reference exercise to dto IDK if this is necessary
             workoutTemplateDto.getWorkoutExercises().stream().map(ex-> exerciseService.convertToDto(ex.getExercise()));
@@ -61,7 +61,7 @@ public class WorkoutController {
     @PutMapping("/workout/{id}/user/update")
     public ResponseEntity<ApiResponse> updateUserWorkoutTemplate(@PathVariable Long id, @RequestBody CreateWorkoutTemplateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
         try {
-            WorkoutTemplate workoutTemplate = workoutService.updateUserWorkoutTemplate(request,userDetails,id);
+            WorkoutTemplate workoutTemplate = workoutService.updateUserWorkoutTemplateV2(request,userDetails,id);
             WorkoutTemplateDto workoutTemplateDto = workoutService.convertToDto(workoutTemplate);
             //Convert the reference exercise to dto IDK if this is necessary
             workoutTemplateDto.getWorkoutExercises().stream().map(ex-> exerciseService.convertToDto(ex.getExercise()));
