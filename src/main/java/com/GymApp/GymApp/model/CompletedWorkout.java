@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Time;
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -26,9 +25,9 @@ public class CompletedWorkout {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private LocalDateTime completedAt;
+    private LocalDate completedAt; //Date it was completed
 
-    private Time duration;
+    private Long durationSeconds;
     private String notes;
 
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)

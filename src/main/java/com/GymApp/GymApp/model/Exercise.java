@@ -64,4 +64,5 @@ public class Exercise {
         this.exerciseType = exerciseType;
         this.createdBy = null;
     }
+
 }

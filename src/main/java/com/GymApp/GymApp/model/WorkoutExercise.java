@@ -51,6 +51,14 @@ public class WorkoutExercise {
         set.setReps(reps);
     }
 
+     public int totalReps() {
+        return sets.stream().mapToInt(WorkoutSet::getReps).sum();
+    }
+
+    public double totalVolume() {
+        return sets.stream().mapToDouble(s -> s.getReps() * s.getWeight()).sum();
+    }
+
     //TODO: In completed Workouts: Calculate volume per muscle group, sets per muscle group, total volume
 }
 

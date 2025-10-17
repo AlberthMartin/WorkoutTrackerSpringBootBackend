@@ -100,7 +100,7 @@ public class ExerciseController {
 
     @DeleteMapping("/exercise/{id}/admin/delete")
     @PreAuthorize("hasRole('ROLE_ADMIN')" )
-    public ResponseEntity<ApiResponse> deleteExerciseByIdAsAdmin(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails userDetails){
+    public ResponseEntity<ApiResponse> deleteExerciseByIdAsAdmin(@PathVariable Long id){
         try{
             exerciseService.deleteExerciseByIdAsAdmin(id);
             return ResponseEntity.ok(new ApiResponse("success, exercise deleted as Admin", true));

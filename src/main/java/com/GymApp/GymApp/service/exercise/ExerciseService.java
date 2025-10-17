@@ -28,6 +28,9 @@ public class ExerciseService implements IExerciseService {
     @Override
     public List<Exercise> getAllExercises(AppUserDetails userDetails) {
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
+        if(currentUser==null){
+            throw new ResourceNotFoundException("User not found");
+        }
         return exerciseRepository.findByUserIdOrGlobal(currentUser.getId());
     }
 

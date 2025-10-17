@@ -78,7 +78,7 @@ public class WorkoutService implements IWorkoutService {
 
     //CreateWorkoutTemplateRequest -> List<CreateExerciseRequest> -> List<CreateWorkoutSetRequest>
     @Override
-    public WorkoutTemplate addUserWorkoutTemplateV2(CreateWorkoutTemplateRequest request, AppUserDetails userDetails) {
+    public WorkoutTemplate addUserWorkoutTemplate(CreateWorkoutTemplateRequest request, AppUserDetails userDetails) {
 
         //Get current user:
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
@@ -125,7 +125,7 @@ public class WorkoutService implements IWorkoutService {
     }
 
     @Override
-    public WorkoutTemplate updateUserWorkoutTemplateV2(CreateWorkoutTemplateRequest request, AppUserDetails userDetails, Long workoutId) {
+    public WorkoutTemplate updateUserWorkoutTemplate(CreateWorkoutTemplateRequest request, AppUserDetails userDetails, Long workoutId) {
         //Find user
         User currentUser = userRepository.findByEmail(userDetails.getUsername());
 

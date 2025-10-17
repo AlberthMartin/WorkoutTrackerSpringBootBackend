@@ -13,7 +13,6 @@ public class CreateWorkoutTemplateRequest {
     @NotBlank
     private String name;
     private String description;
-    private User createdBy;
     private List<CreateWorkoutExerciseRequest> workoutExercises;
 
 }

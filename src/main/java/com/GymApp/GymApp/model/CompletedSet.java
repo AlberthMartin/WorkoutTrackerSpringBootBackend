@@ -18,6 +18,8 @@ public class CompletedSet {
 
     private int reps;
     private double weight;
+    private int restSeconds;
+    private int orderNumber;
 
     @ManyToOne
     @JoinColumn(name = "workout_id", nullable = false)

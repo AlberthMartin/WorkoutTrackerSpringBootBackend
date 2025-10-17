@@ -47,7 +47,7 @@ public class WorkoutController {
     @PostMapping("/add/user/workout")
     public ResponseEntity<ApiResponse> addUserWorkoutTemplate(@RequestBody CreateWorkoutTemplateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
         try {
-            WorkoutTemplate workoutTemplate = workoutService.addUserWorkoutTemplateV2(request, userDetails);
+            WorkoutTemplate workoutTemplate = workoutService.addUserWorkoutTemplate(request, userDetails);
             WorkoutTemplateDto workoutTemplateDto = workoutService.convertToDto(workoutTemplate);
             //Convert the reference exercise to dto IDK if this is necessary
             workoutTemplateDto.getWorkoutExercises().stream().map(ex-> exerciseService.convertToDto(ex.getExercise()));
@@ -57,11 +57,11 @@ public class WorkoutController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
-
+    @PreAuthorize("hasRole('ROLE_USER')" )
     @PutMapping("/workout/{id}/user/update")
     public ResponseEntity<ApiResponse> updateUserWorkoutTemplate(@PathVariable Long id, @RequestBody CreateWorkoutTemplateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
         try {
-            WorkoutTemplate workoutTemplate = workoutService.updateUserWorkoutTemplateV2(request,userDetails,id);
+            WorkoutTemplate workoutTemplate = workoutService.updateUserWorkoutTemplate(request,userDetails,id);
             WorkoutTemplateDto workoutTemplateDto = workoutService.convertToDto(workoutTemplate);
             //Convert the reference exercise to dto IDK if this is necessary
             workoutTemplateDto.getWorkoutExercises().stream().map(ex-> exerciseService.convertToDto(ex.getExercise()));
@@ -74,6 +74,14 @@ public class WorkoutController {
 
     }
 
-
-    //@DeleteMapping("/exercise/{id}/user/delete")
+    @PreAuthorize("hasRole('ROLE_USER')" )
+    @DeleteMapping("/workout/{id}/user/delete")
+    public ResponseEntity<ApiResponse> deleteUserWorkoutTemplate(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails userDetails) {
+        try {
+            workoutService.deleteUserWorkoutTemplate(id,userDetails);
+            return ResponseEntity.ok(new ApiResponse("Workouttemplate deleted successfully", null));
+        } catch (ActionNotAllowedException | ResourceNotFoundException e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
 }
