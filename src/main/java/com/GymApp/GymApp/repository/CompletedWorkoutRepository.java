@@ -11,5 +11,5 @@ public interface CompletedWorkoutRepository extends CrudRepository<CompletedWork
     //Gett all users completed workouts
     List<CompletedWorkout> findByUserId(Long userId);
 
-    CompletedWorkout findByWorkoutId(Long workoutId);
+    CompletedWorkout findById(Long id);
 }

@@ -102,7 +102,7 @@ public class HistoryService implements IHistoryService {
             throw new ResourceNotFoundException("User not found");
         }
         CompletedWorkout workoutToBeDeleted =
-                completedWorkoutRepository.findByWorkoutId(completedWorkoutId);
+                completedWorkoutRepository.findById(completedWorkoutId);
 
         if(!workoutToBeDeleted.getUser().equals(user)){
             throw new ActionNotAllowedException("User not found");
@@ -117,7 +117,7 @@ public class HistoryService implements IHistoryService {
         if (currentUser == null) {
             throw new ResourceNotFoundException("How did you get here? Log in please");
         }
-        CompletedWorkout completedWorkoutToBeUpdated = completedWorkoutRepository.findByWorkoutId(completedWorkoutId);
+        CompletedWorkout completedWorkoutToBeUpdated = completedWorkoutRepository.findById(completedWorkoutId);
 
         if(!completedWorkoutToBeUpdated.getUser().equals(currentUser)){
             throw new ActionNotAllowedException("User not found");

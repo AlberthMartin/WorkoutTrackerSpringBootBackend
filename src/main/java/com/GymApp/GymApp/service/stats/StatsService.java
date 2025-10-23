@@ -7,7 +7,5 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StatsService {
-    private final CompletedWorkoutRepository completedWorkoutRepository;
-    private final UserStatsPeriodRepository userStatsPeriodRepository;
-    private final ExerciseStatsRepository exerciseStatsRepository;
+
 }
